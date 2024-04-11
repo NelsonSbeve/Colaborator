@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using DataModel.Repository;
+using Application.Services;
 
 namespace Domain
 {
@@ -16,6 +17,8 @@ namespace Domain
 		protected virtual void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllers();
+			
+			
 
 			services
 				.AddEndpointsApiExplorer()
@@ -26,7 +29,7 @@ namespace Domain
 				});
 		}
 
-		public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ColaboratorConsumer colaboratorConsumer)
 		{
 			if (env.IsDevelopment())
 			{
@@ -34,6 +37,7 @@ namespace Domain
 				app.UseSwaggerUI();
 			}
 
+	 		
 			app.UseHttpsRedirection();
 			app.UseRouting();
 			app.UseAuthorization();
@@ -41,6 +45,8 @@ namespace Domain
 			{
 				endpoints.MapControllers();
 			});
+	
+			
 		}
 	}
 }

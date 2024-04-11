@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Services;
 using Application.DTO;
 using Domain.Factory;
+using RabbitMQ.Client;
+
 
 namespace WebApi.Controllers
 {
@@ -11,12 +13,14 @@ namespace WebApi.Controllers
     public class ColaboratorController : ControllerBase
     {   
         private readonly ColaboratorService _colaboratorService;
+        private readonly ColaboratorPublisher _colaboratorPublisher;
 
         List<string> _errorMessages = new List<string>();
 
-        public ColaboratorController(ColaboratorService colaboratorService)
+        public ColaboratorController(ColaboratorService colaboratorService, ColaboratorPublisher colaboratorPublisher)
         {
             _colaboratorService = colaboratorService;
+            _colaboratorPublisher = colaboratorPublisher;
         }
 
         // GET: api/Colaborator
@@ -85,10 +89,15 @@ namespace WebApi.Controllers
         {
             ColaboratorDTO colaboratorResultDTO = await _colaboratorService.Add(colaboratorDTO, _errorMessages);
 
-            if(colaboratorResultDTO != null)
-                return CreatedAtAction(nameof(GetColaboratorByEmail), new { email = colaboratorDTO.Email }, colaboratorResultDTO);
-            else
+            if(colaboratorResultDTO != null){
+                
+                _colaboratorPublisher.PublishMessage($"New collaborator created with Id = {colaboratorResultDTO.Id}");
+                
+
+                return CreatedAtAction(nameof(GetColaboratorById), new { Id = colaboratorDTO.Id }, colaboratorResultDTO);
+            }else{
                 return BadRequest(_errorMessages);
+            }
         }
 
         // // DELETE: api/Colaborator/5

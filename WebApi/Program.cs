@@ -37,6 +37,10 @@ builder.Services.AddTransient<IColaboratorRepository, ColaboratorRepository>();
 builder.Services.AddTransient<IColaboratorFactory, ColaboratorFactory>();
 builder.Services.AddTransient<ColaboratorMapper>();
 builder.Services.AddTransient<ColaboratorService>();
+builder.Services.AddTransient<ColaboratorPublisher>();
+builder.Services.AddSingleton<IColaboratorConsumer, ColaboratorConsumer>();
+
+
 
 
 
@@ -56,5 +60,10 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+var rabbitMQConsumerService = app.Services.GetRequiredService<IColaboratorConsumer>();
+rabbitMQConsumerService.StartConsuming();
+ 
 
 app.Run();

@@ -5,11 +5,9 @@ using System.Net.Mail;
 
 public class Colaborator : IColaborator
 {
-	// só para efeitos de persistência; gerado pela persistência
-
-	public long Id {get; set;}
-
+	
 	[Key]
+	public long Id {get; set;}
     private string _strEmail;
 	public string Email
 	{
