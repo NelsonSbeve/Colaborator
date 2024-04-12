@@ -21,13 +21,7 @@ public class ColaboratorConsumer : IColaboratorConsumer
             _channel = _connection.CreateModel();
  
             _channel.ExchangeDeclare(exchange: "logs", type: ExchangeType.Fanout);
- 
-            _channel.QueueDeclare(queue: "collaborator_queue",
-                                durable: false,
-                                exclusive: false,
-                                autoDelete: false,
-                                arguments: null);
-           
+
             _channel.QueueBind(queue: "collaborator_queue",
                   exchange: "logs",
                   routingKey: string.Empty);
@@ -45,7 +39,7 @@ public class ColaboratorConsumer : IColaboratorConsumer
  
                 Console.WriteLine($" [x] Received {message}");
  
-                _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                
             };
             _channel.BasicConsume(queue: "collaborator_queue",
                                 autoAck: true,

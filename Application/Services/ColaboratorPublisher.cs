@@ -13,6 +13,7 @@ namespace Application.Services
     {
         private readonly ConnectionFactory _connectionFactory;
         private readonly string _queueName;
+        private readonly IModel channel;
 
         public ColaboratorPublisher(IConfiguration configuration)
         {
@@ -24,26 +25,30 @@ namespace Application.Services
                 Password = configuration["RabbitMQ:Password"]
             };
            _queueName = configuration["RabbitMQ:QueueName"] ?? throw new InvalidOperationException("Queue name is null. Please check configuration.");
+           
+            var connection = _connectionFactory.CreateConnection();
+            channel = connection.CreateModel();
+            channel.ExchangeDeclare(exchange: "logs", type: ExchangeType.Fanout);
+        
         }
+   
+
+       
 
         public void PublishMessage(string message)
         {
-            using (var connection = _connectionFactory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: _queueName,
-                                    durable: false,
-                                    exclusive: false,
-                                    autoDelete: false,
-                                    arguments: null);
+          
+          
 
-                var body = Encoding.UTF8.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(message);
+            
+            channel.BasicPublish(exchange: "logs",
+                              routingKey: string.Empty,
+                              basicProperties: null,
+                              body: body);
+            
 
-                channel.BasicPublish(exchange: "",
-                                    routingKey: _queueName,
-                                    basicProperties: null,
-                                    body: body);
-            }
+           
         }
     }
 }
