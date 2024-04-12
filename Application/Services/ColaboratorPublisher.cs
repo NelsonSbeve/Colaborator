@@ -28,7 +28,7 @@ namespace Application.Services
            
             var connection = _connectionFactory.CreateConnection();
             channel = connection.CreateModel();
-            channel.ExchangeDeclare(exchange: "logs", type: ExchangeType.Fanout);
+            channel.ExchangeDeclare(exchange: "colab_logs", type: ExchangeType.Fanout);
         
         }
    
@@ -42,8 +42,8 @@ namespace Application.Services
 
             var body = Encoding.UTF8.GetBytes(message);
             
-            channel.BasicPublish(exchange: "logs",
-                              routingKey: string.Empty,
+            channel.BasicPublish(exchange: "colab_logs",
+                              routingKey: "colabKey",
                               basicProperties: null,
                               body: body);
             
